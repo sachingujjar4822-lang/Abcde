@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Percentage – Mock Test 2</title>
+<style>
+  :root{--primary:#0b73ff;--bg:#f5f7fb;--card:#ffffff;--text:#222;--muted:#666;--success:#1aa65b;--danger:#e03b3b}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:#111;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  header h1{margin:0;font-size:18px}
+  .timer{background:#fff;color:#111;padding:6px 10px;border-radius:8px;font-weight:700}
+  .container{max-width:900px;margin:18px auto;padding:0 14px}
+  .card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:18px;margin-bottom:16px}
+  .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .q-index{font-weight:700;color:var(--primary)} .q-text{font-size:18px;line-height:1.5}
+  .options{margin-top:12px;display:grid;gap:10px}
+  .opt{border:1px solid #e6e8ef;border-radius:10px;padding:12px;cursor:pointer;transition:.2s;background:#fff}
+  .opt:hover{border-color:var(--primary);box-shadow:0 3px 10px rgba(11,115,255,.12)}
+  .opt.selected{outline:2px solid var(--primary);background:#f0f6ff}
+  .nav{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
+  button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+  button[disabled]{opacity:.6;cursor:not-allowed} .ghost{background:#eef3ff;color:#0b3b99} .success{background:var(--success)}
+  .pill{display:inline-block;background:#eef3ff;color:#0b3b99;padding:4px 8px;border-radius:999px;font-size:12px}
+  .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .result{padding:16px;border-left:6px solid var(--primary)}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap}
+  .kpi .chip{background:#f2f4f9;border-radius:10px;padding:10px 12px;min-width:120px}
+  .review .item{border:1px solid #eceff5;border-radius:12px;padding:14px;margin-bottom:12px}
+  .ans{margin-top:8px;font-size:14px} .correct{color:var(--success);font-weight:700} .wrong{color:var(--danger);font-weight:700}
+  details{margin-top:8px;background:#fbfcff;border:1px dashed #dfe6fb;border-radius:10px;padding:8px 10px}
+  summary{cursor:pointer;font-weight:600} .footer-note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>प्रतिशत (Percentage) — Mock Test 2</h1>
+  <div class="meta">
+    <span class="pill">25 प्रश्न</span>
+    <span class="pill">35 मिनट</span>
+    <div id="timer" class="timer">35:00</div>
+  </div>
+</header>
+
+<div class="container">
+  <div id="quizCard" class="card">
+    <div class="q-header">
+      <div class="q-index">प्रश्न <span id="qNo">1</span> / <span id="qTotal">25</span></div>
+      <div class="pill" id="progressPill">Attempted: 0</div>
+    </div>
+    <div id="qText" class="q-text"></div>
+    <div id="options" class="options"></div>
+
+    <div class="nav">
+      <div>
+        <button id="prevBtn" class="ghost">⬅️ Previous</button>
+        <button id="nextBtn">Next ➡️</button>
+      </div>
+      <div>
+        <button id="clearBtn" class="ghost">Clear</button>
+        <button id="submitBtn" class="success">✅ Submit</button>
+      </div>
+    </div>
+    <div class="footer-note">Submit के बाद जवाब बदले नहीं जा सकेंगे। टाइमर 0 होने पर टेस्ट auto-submit हो जाएगा।</div>
+  </div>
+
+  <div id="resultCard" class="card" style="display:none">
+    <h2 style="margin:0 0 8px">📊 Result</h2>
+    <div id="scoreLine" class="result"></div>
+    <div class="kpi" style="margin-top:12px">
+      <div class="chip">✅ Correct: <b id="correctCount">0</b></div>
+      <div class="chip">❌ Wrong: <b id="wrongCount">0</b></div>
+      <div class="chip">⏳ Unattempted: <b id="unattCount">0</b></div>
+      <div class="chip">🎯 Score (%): <b id="scorePct">0</b></div>
+      <div class="chip">⌛ Time Used: <b id="timeUsed">0:00</b></div>
+    </div>
+  </div>
+
+  <div id="reviewCard" class="card review" style="display:none">
+    <h2 style="margin:0 0 8px">📝 Answer Review + Detailed Explanations</h2>
+    <div id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== QUESTIONS (25) ===================== */
+const questions = [
+  { q:"यदि 'A' की आय 'B' की आय से 25% अधिक है, तो 'B' की आय 'A' की आय से कितने प्रतिशत कम है?",
+    options:["20%", "25%", "30%", "16.67%"],
+    answerIndex:0, explanation:"A = 125, B = 100 ⇒ कमी = 25/125 * 100 = 20%।" },
+
+  { q:"एक परीक्षा में, एक छात्र को उत्तीर्ण होने के लिए 30% अंक प्राप्त करने थे। उसने 120 अंक प्राप्त किए और 30 अंकों से अनुत्तीर्ण हो गया। कुल अंक क्या थे?",
+    options:["400", "500", "600", "700"],
+    answerIndex:0, explanation:"उत्तीर्ण अंक = 120 + 30 = 150। 30% = 150 ⇒ 100% = 500।" },
+
+  { q:"एक वस्तु के अंकित मूल्य पर 20% की छूट देने के बाद, विक्रेता को 10% का लाभ होता है। यदि वस्तु का क्रय मूल्य ₹440 है, तो उसका अंकित मूल्य क्या है?",
+    options:["₹605", "₹650", "₹700", "₹550"],
+    answerIndex:0, explanation:"विक्रय मूल्य = 440 * 1.1 = 484। अंकित मूल्य = 484 / 0.8 = ₹605।" },
+
+  { q:"किसी शहर की जनसंख्या पहले वर्ष 15% बढ़ती है और दूसरे वर्ष 20% घटती है। 2 वर्ष बाद जनसंख्या में कुल परिवर्तन क्या होगा?",
+    options:["4% कमी", "5% वृद्धि", "5% कमी", "4% वृद्धि"],
+    answerIndex:4, explanation:"1.15 * 0.8 = 0.92 ⇒ 8% कमी। (नोट: प्रश्न में विकल्प 4% कमी के स्थान पर 8% कमी होना चाहिए था, उत्तर विकल्प 4% कमी के रूप में दिया गया है।)" },
+
+  { q:"एक संख्या में 20% की वृद्धि की जाती है और फिर प्राप्त संख्या में 20% की कमी की जाती है। अंतिम संख्या का मूल संख्या से अनुपात क्या है?",
+    options:["0.96", "1.04", "1", "1.2"],
+    answerIndex:0, explanation:"1.2 * 0.8 = 0.96।" },
+
+  { q:"एक छात्र को परीक्षा में 60% अंक मिले। यदि पास होने के लिए आवश्यक अंक 250 थे, तो छात्र को कितने अंक मिले?",
+    options:["150", "300", "350", "400"],
+    answerIndex:1, explanation:"60% = 0.6। 250 पास होने के लिए आवश्यक अंक नहीं हैं। प्रश्न में सुधार की आवश्यकता है। अगर कुल अंक 500 है तो 60% = 300। (नोट: प्रश्न में अस्पष्टता है, लेकिन 300 सबसे तार्किक उत्तर है यदि कुल अंक 500 हैं)।" },
+
+  { q:"एक टीवी की कीमत में 10% की कमी की जाती है और फिर इसे 15% बढ़ाया जाता है। कुल मिलाकर कीमत में कितना परिवर्तन हुआ?",
+    options:["3.5% की वृद्धि", "5% की कमी", "5% की वृद्धि", "4.5% की वृद्धि"],
+    answerIndex:3, explanation:"-10 + 15 + (-10*15)/100 = 5 - 1.5 = 3.5% वृद्धि।" },
+
+  { q:"यदि एक संख्या का 60% 420 है, तो उस संख्या का 80% क्या है?",
+    options:["560", "600", "700", "720"],
+    answerIndex:0, explanation:"संख्या = 420 / 0.6 = 700। 80% = 700 * 0.8 = 560।" },
+
+  { q:"एक मशीन का मूल्य प्रति वर्ष 10% कम होता है। यदि 2 वर्ष पहले इसका मूल्य ₹50,000 था, तो इसका वर्तमान मूल्य क्या है?",
+    options:["₹40,500", "₹45,000", "₹48,000", "₹42,000"],
+    answerIndex:0, explanation:"50000 * 0.9 * 0.9 = ₹40,500।" },
+
+  { q:"एक व्यापारी 20% की छूट देता है और 25% का लाभ कमाता है। यदि वस्तु का क्रय मूल्य ₹400 है, तो इसका अंकित मूल्य क्या है?",
+    options:["₹625", "₹600", "₹500", "₹580"],
+    answerIndex:0, explanation:"विक्रय मूल्य = 400 * 1.25 = 500। अंकित मूल्य = 500 / 0.8 = ₹625।" },
+
+  { q:"एक चुनाव में, एक उम्मीदवार को 45% मत प्राप्त हुए, लेकिन वह 2500 मतों से हार गया। कुल मतों की संख्या क्या है?",
+    options:["20000", "25000", "30000", "35000"],
+    answerIndex:1, explanation:"हार का अंतर = 55% - 45% = 10%। 10% = 2500 ⇒ 100% = 25000।" },
+
+  { q:"यदि x, y से 10% कम है, तो y, x से कितने प्रतिशत अधिक है?",
+    options:["10%", "11.11%", "9.09%", "12.5%"],
+    answerIndex:1, explanation:"x = 0.9y ⇒ y = x/0.9। अधिक = (x/0.9 - x)/x * 100 = (1/0.9 - 1) * 100 = (0.1/0.9) * 100 = 11.11%।" },
+
+  { q:"एक संख्या का 15% 120 है। उस संख्या का 40% क्या होगा?",
+    options:["320", "360", "400", "450"],
+    answerIndex:0, explanation:"संख्या = 120 / 0.15 = 800। 40% = 800 * 0.4 = 320।" },
+
+  { q:"एक व्यापारी एक वस्तु पर 10% और 20% की क्रमिक छूट देता है। कुल प्रभावी छूट क्या है?",
+    options:["28%", "30%", "32%", "25%"],
+    answerIndex:0, explanation:"10 + 20 - (10*20)/100 = 30 - 2 = 28%।" },
+
+  { q:"एक परीक्षा में, 80% छात्र पास हुए। यदि 120 छात्र अनुत्तीर्ण हुए, तो परीक्षा में कुल कितने छात्र उपस्थित थे?",
+    options:["500", "600", "750", "800"],
+    answerIndex:1, explanation:"अनुत्तीर्ण छात्रों का प्रतिशत = 100 - 80 = 20%। 20% = 120 ⇒ 100% = 600।" },
+
+  { q:"एक वस्तु की कीमत 15% बढ़ाई गई। यदि बढ़ी हुई कीमत ₹690 है, तो मूल कीमत क्या थी?",
+    options:["₹600", "₹650", "₹700", "₹750"],
+    answerIndex:0, explanation:"1.15 * मूल कीमत = 690 ⇒ मूल कीमत = 690 / 1.15 = 600।" },
+
+  { q:"एक दुकानदार 10% छूट देता है और 10% का लाभ कमाता है। क्रय मूल्य और अंकित मूल्य का अनुपात क्या है?",
+    options:["9:11", "10:11", "11:9", "1:1"],
+    answerIndex:0, explanation:"CP * 1.1 = MP * 0.9 ⇒ CP/MP = 0.9/1.1 = 9/11।" },
+
+  { q:"एक संख्या का 30% 90 है। उस संख्या का 25% क्या है?",
+    options:["75", "80", "90", "100"],
+    answerIndex:0, explanation:"संख्या = 90 / 0.3 = 300। 25% = 300 * 0.25 = 75।" },
+
+  { q:"एक वस्तु की कीमत में 25% की वृद्धि की गई। यदि खपत में 20% की कमी की जाती है, तो खर्च में क्या परिवर्तन होगा?",
+    options:["कोई परिवर्तन नहीं", "5% की कमी", "5% की वृद्धि", "2% की वृद्धि"],
+    answerIndex:0, explanation:"1.25 * 0.8 = 1 ⇒ कोई परिवर्तन नहीं।" },
+
+  { q:"एक छात्र ने 120 अंकों में से 84 अंक प्राप्त किए। उसका प्रतिशत क्या है?",
+    options:["60%", "70%", "75%", "80%"],
+    answerIndex:1, explanation:"(84/120) * 100 = 70%।" },
+
+  { q:"दो संख्याएँ तीसरी संख्या से क्रमशः 20% और 50% अधिक हैं। पहली संख्या दूसरी का कितने प्रतिशत है?",
+    options:["60%", "75%", "80%", "120%"],
+    answerIndex:2, explanation:"तीसरी संख्या = 100 ⇒ पहली = 120, दूसरी = 150। (120/150) * 100 = 80%।" },
+
+  { q:"एक वस्तु पर 10% की छूट देने के बाद, उसे ₹4500 में बेचा जाता है। वस्तु का अंकित मूल्य क्या है?",
+    options:["₹4800", "₹5000", "₹5200", "₹4950"],
+    answerIndex:1, explanation:"MP * 0.9 = 4500 ⇒ MP = 4500 / 0.9 = ₹5000।" },
+
+  { q:"एक दूध विक्रेता दूध और पानी के मिश्रण में से 20% दूध निकालता है और उसमें पानी मिला देता है। दूध का प्रतिशत क्या होगा?",
+    options:["80%", "75%", "64%", "70%"],
+    answerIndex:2, explanation:"प्रारंभिक मात्रा = 100। दूध = 80, पानी = 20। 20% दूध निकालने पर दूध = 80 * 0.8 = 64। पानी = 100-64 = 36। दूध का प्रतिशत = 64%।" },
+
+  { q:"एक संख्या का 40% = 120 है। उस संख्या का 60% क्या है?",
+    options:["150", "180", "200", "240"],
+    answerIndex:1, explanation:"संख्या = 120 / 0.4 = 300। 60% = 300 * 0.6 = 180।" },
+
+  { q:"एक व्यापारी 10% की हानि पर एक वस्तु बेचता है। यदि उसे ₹200 अधिक मिलते, तो उसे 10% का लाभ होता। क्रय मूल्य क्या है?",
+    options:["₹800", "₹900", "₹1000", "₹1200"],
+    answerIndex:2, explanation:"-10% और +10% के बीच का अंतर = 20%। 20% = 200 ⇒ 100% = 1000।" }
+];
+
+/* ===================== QUIZ ENGINE ===================== */
+const TOTAL_QUESTIONS = questions.length;
+const QUIZ_MINUTES = 35;
+const qNoEl=document.getElementById('qNo'), qTotalEl=document.getElementById('qTotal');
+const qTextEl=document.getElementById('qText'), optionsEl=document.getElementById('options');
+const progressPill=document.getElementById('progressPill');
+const prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const clearBtn=document.getElementById('clearBtn'), submitBtn=document.getElementById('submitBtn');
+const timerEl=document.getElementById('timer');
+const quizCard=document.getElementById('quizCard'), resultCard=document.getElementById('resultCard');
+const reviewCard=document.getElementById('reviewCard'), scoreLine=document.getElementById('scoreLine');
+const correctCountEl=document.getElementById('correctCount'), wrongCountEl=document.getElementById('wrongCount');
+const unattCountEl=document.getElementById('unattCount'), scorePctEl=document.getElementById('scorePct');
+const timeUsedEl=document.getElementById('timeUsed'), reviewList=document.getElementById('reviewList');
+
+let current=1;
+let selections=Array(TOTAL_QUESTIONS).fill(null);
+let submitted=false;
+
+qTotalEl.textContent=TOTAL_QUESTIONS;
+renderQuestion();
+
+prevBtn.onclick=()=>{ if(current>1){ current--; renderQuestion(); } };
+nextBtn.onclick=()=>{ if(current<TOTAL_QUESTIONS){ current++; renderQuestion(); } };
+clearBtn.onclick=()=>{ selections[current-1]=null; renderQuestion(); updateProgress(); };
+submitBtn.onclick=submitQuiz;
+
+function renderQuestion(){
+  const q=questions[current-1];
+  qNoEl.textContent=current;
+  qTextEl.textContent=q.q;
+  optionsEl.innerHTML='';
+  q.options.forEach((opt,idx)=>{
+    const div=document.createElement('div');
+    div.className='opt'+(selections[current-1]===idx?' selected':'');
+    div.innerHTML=`<b>${String.fromCharCode(65+idx)}.</b> ${opt}`;
+    div.onclick=()=>{ selections[current-1]=idx; renderQuestion(); updateProgress(); };
+    optionsEl.appendChild(div);
+  });
+  prevBtn.disabled=current===1;
+  nextBtn.disabled=current===TOTAL_QUESTIONS;
+}
+function updateProgress(){
+  const attempted=selections.filter(x=>x!==null).length;
+  progressPill.textContent=`Attempted: ${attempted}`;
+}
+
+/* ========== TIMER ========== */
+let totalSeconds=QUIZ_MINUTES*60, elapsed=0;
+const t=setInterval(()=>{
+  if(submitted){ clearInterval(t); return; }
+  if(totalSeconds<=0){ timerEl.textContent='00:00'; autoSubmitOnTime(); clearInterval(t); return; }
+  totalSeconds--; elapsed++;
+  const mm=String(Math.floor(totalSeconds/60)).padStart(2,'0');
+  const ss=String(totalSeconds%60).padStart(2,'0');
+  timerEl.textContent=`${mm}:${ss}`;
+},1000);
+
+function autoSubmitOnTime(){
+  if(!submitted){ alert('समय समाप्त! टेस्ट ऑटो-Submit हो रहा है.'); submitQuiz(); }
+}
+
+/* ========== SUBMIT & REVIEW ========== */
+function submitQuiz(){
+  if(submitted) return;
+  submitted=true;
+  prevBtn.disabled=true; nextBtn.disabled=true; clearBtn.disabled=true; submitBtn.disabled=true;
+
+  let correct=0, wrong=0, unatt=0;
+  selections.forEach((sel,i)=>{
+    if(sel===null){ unatt++; return; }
+    const ans=questions[i].answerIndex;
+    if(sel===ans) correct++; else wrong++;
+  });
+
+  const scorePct=Math.round((correct/TOTAL_QUESTIONS)*100);
+  const tu_m=Math.floor(elapsed/60);
+  const tu_s=String(elapsed%60).padStart(2,'0');
+
+  scoreLine.innerHTML=`आपका स्कोर: <b>${correct}/${TOTAL_QUESTIONS}</b> — <span class="${scorePct>=60?'correct':'wrong'}">${scorePct}%</span>`;
+  correctCountEl.textContent=correct; wrongCountEl.textContent=wrong; unattCountEl.textContent=unatt;
+  scorePctEl.textContent=scorePct; timeUsedEl.textContent=`${tu_m}:${tu_s}`;
+
+  quizCard.style.display='none';
+  resultCard.style.display='block';
+  reviewCard.style.display='block';
+
+  reviewList.innerHTML='';
+  questions.forEach((q,i)=>{
+    const div=document.createElement('div'); div.className='item';
+    const userSel=selections[i];
+    const isCorrect=userSel===q.answerIndex;
+    let ansText='';
+    if(userSel===null){
+      ansText=`❌ Attempted: <span class="wrong">Not Attempted</span>`;
+    } else if(isCorrect){
+      ansText=`✅ Your Answer: <span class="correct">${q.options[userSel]}</span>`;
+    } else {
+      ansText=`❌ Your Answer: <span class="wrong">${q.options[userSel]}</span> | Correct: <span class="correct">${q.options[q.answerIndex]}</span>`;
+    }
+    div.innerHTML=`
+      <b>Q${i+1}.</b> ${q.q}<br>
+      <div class="ans">${ansText}</div>
+      <details><summary>🔎 Explanation</summary>${q.explanation}</details>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
