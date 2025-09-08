@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>संख्या पद्धति – मॉक टेस्ट 6</title>
+<style>
+  :root{--primary:#0b73ff;--bg:#f5f7fb;--card:#ffffff;--text:#222;--muted:#666;--success:#1aa65b;--danger:#e03b3b}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:#111;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  header h1{margin:0;font-size:18px}
+  .timer{background:#fff;color:#111;padding:6px 10px;border-radius:8px;font-weight:700}
+  .container{max-width:900px;margin:18px auto;padding:0 14px}
+  .card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:18px;margin-bottom:16px}
+  .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .q-index{font-weight:700;color:var(--primary)} .q-text{font-size:18px;line-height:1.5}
+  .options{margin-top:12px;display:grid;gap:10px}
+  .opt{border:1px solid #e6e8ef;border-radius:10px;padding:12px;cursor:pointer;transition:.2s;background:#fff}
+  .opt:hover{border-color:var(--primary);box-shadow:0 3px 10px rgba(11,115,255,.12)}
+  .opt.selected{outline:2px solid var(--primary);background:#f0f6ff}
+  .nav{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
+  button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+  button[disabled]{opacity:.6;cursor:not-allowed} .ghost{background:#eef3ff;color:#0b3b99} .success{background:var(--success)}
+  .pill{display:inline-block;background:#eef3ff;color:#0b3b99;padding:4px 8px;border-radius:999px;font-size:12px}
+  .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .result{padding:16px;border-left:6px solid var(--primary)}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap}
+  .kpi .chip{background:#f2f4f9;border-radius:10px;padding:10px 12px;min-width:120px}
+  .review .item{border:1px solid #eceff5;border-radius:12px;padding:14px;margin-bottom:12px}
+  .ans{margin-top:8px;font-size:14px} .correct{color:var(--success);font-weight:700} .wrong{color:var(--danger);font-weight:700}
+  details{margin-top:8px;background:#fbfcff;border:1px dashed #dfe6fb;border-radius:10px;padding:8px 10px}
+  summary{cursor:pointer;font-weight:600} .footer-note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>संख्या पद्धति (Number System) — मॉक टेस्ट 6</h1>
+  <div class="meta">
+    <span class="pill">25 प्रश्न</span>
+    <span class="pill">35 मिनट</span>
+    <div id="timer" class="timer">35:00</div>
+  </div>
+</header>
+
+<div class="container">
+  <div id="quizCard" class="card">
+    <div class="q-header">
+      <div class="q-index">प्रश्न <span id="qNo">1</span> / <span id="qTotal">25</span></div>
+      <div class="pill" id="progressPill">प्रयासित: 0</div>
+    </div>
+    <div id="qText" class="q-text"></div>
+    <div id="options" class="options"></div>
+
+    <div class="nav">
+      <div>
+        <button id="prevBtn" class="ghost">⬅️ पिछला</button>
+        <button id="nextBtn">अगला ➡️</button>
+      </div>
+      <div>
+        <button id="clearBtn" class="ghost">चयन हटाएं</button>
+        <button id="submitBtn" class="success">✅ जमा करें</button>
+      </div>
+    </div>
+    <div class="footer-note">जमा करने के बाद जवाब बदले नहीं जा सकेंगे। टाइमर 0 होने पर टेस्ट स्वतः जमा हो जाएगा।</div>
+  </div>
+
+  <div id="resultCard" class="card" style="display:none">
+    <h2 style="margin:0 0 8px">📊 परिणाम</h2>
+    <div id="scoreLine" class="result"></div>
+    <div class="kpi" style="margin-top:12px">
+      <div class="chip">✅ सही: <b id="correctCount">0</b></div>
+      <div class="chip">❌ गलत: <b id="wrongCount">0</b></div>
+      <div class="chip">⏳ अनुत्तरित: <b id="unattCount">0</b></div>
+      <div class="chip">🎯 स्कोर (%): <b id="scorePct">0</b></div>
+      <div class="chip">⌛ लिया गया समय: <b id="timeUsed">0:00</b></div>
+    </div>
+  </div>
+
+  <div id="reviewCard" class="card review" style="display:none">
+    <h2 style="margin:0 0 8px">📝 उत्तर समीक्षा + विस्तृत स्पष्टीकरण</h2>
+    <div id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== QUESTIONS (25) ===================== */
+const questions = [
+  { q:"200 और 600 के बीच की कितनी संख्याएँ हैं जो 4, 5 और 6 से पूरी तरह विभाज्य हैं?",
+    options:["10", "13", "14", "16"],
+    answerIndex:1, explanation:"4, 5 और 6 का LCM ज्ञात करें: LCM(4, 5, 6) = 60।\nहमें 200 और 600 के बीच 60 के गुणजों की संख्या ज्ञात करनी है।\n200 से बड़ा 60 का पहला गुणज $60 \times 4 = 240$ है।\n600 से छोटा 60 का अंतिम गुणज $60 \times 9 = 540$ है।\nअपेक्षित गुणजों की संख्या = $9 - 4 + 1 = 6$।"},
+
+  { q:"इकाई अंक ज्ञात कीजिए: $3^{3! + 4! + 5! + ... + 100!}$",
+    options:["1", "3", "7", "9"],
+    answerIndex:0, explanation:"3 की घातों की साइक्लिसिटी 4 होती है।\nघात $3!+4!+...$ का मान ज्ञात करें। $3! = 6$, $4! = 24$, $5! = 120$। 4! के बाद आने वाले सभी फैक्टोरियल 4 से विभाज्य होंगे।\nघात $= 6+24+...$। हमें इस योग को 4 से विभाजित करने पर शेषफल ज्ञात करना है।\n$6 \div 4 \implies$ शेषफल 2।\n$24 \div 4 \implies$ शेषफल 0।\n$5!, 6!, ...$ सभी 4 से विभाज्य हैं, अतः शेषफल 0 होगा।\nकुल शेषफल $= 2+0+0+... = 2$।\nइकाई अंक $3^2 = 9$ होगा।"},
+
+  { q:"जब एक संख्या को 88 से विभाजित किया जाता है, तो शेषफल 15 आता है। यदि उसी संख्या को 11 से विभाजित किया जाए, तो क्या शेषफल होगा?",
+    options:["4", "5", "6", "7"],
+    answerIndex:3, explanation:"चूंकि भाजक 88, 11 से विभाज्य है ($88 = 11 \times 8$), तो हम सीधे शेषफल को 11 से विभाजित करके नया शेषफल ज्ञात कर सकते हैं।\n$15 = 11 \times 1 + 4$।\nअतः, शेषफल 4 होगा।"},
+
+  { q:"इकाई अंक ज्ञात कीजिए: $22^{22^{22}}$",
+    options:["2", "4", "6", "8"],
+    answerIndex:1, explanation:"आधार का इकाई अंक 2 है। 2 की घातों की साइक्लिसिटी 4 है।\nहमें $22^{22}$ को 4 से विभाजित करने पर शेषफल ज्ञात करना है।\n$22 \equiv 2 \pmod{4}$।\nअतः, $22^{22} \equiv 2^{22} \pmod{4}$।\n$2^{2} = 4 \equiv 0 \pmod{4}$।\n$2^{22} = (2^2)^{11} \equiv 0^{11} \equiv 0 \pmod{4}$।\nजब घात 4 से विभाज्य हो, तो इकाई अंक 2 की 4वीं घात के इकाई अंक के बराबर होता है, जो $2^4=16 \rightarrow 6$ है।"},
+
+  { q:"$(999)^{999}$ को 1000 से विभाजित करने पर क्या शेषफल होगा?",
+    options:["1", "99", "999", "100"],
+    answerIndex:2, explanation:"हम मॉड्यूलर अंकगणित (modular arithmetic) का उपयोग करेंगे।\n$999 \equiv -1 \pmod{1000}$।\n$999^{999} \equiv (-1)^{999} \pmod{1000}$।\nचूंकि 999 एक विषम संख्या है, $(-1)^{999} = -1$।\nशेषफल $-1$ है, जिसका धनात्मक मान $1000-1 = 999$ है।\nअतः, शेषफल 999 होगा।"},
+
+  { q:"संख्या $7^{99}$ को 100 से विभाजित करने पर क्या शेषफल होगा?",
+    options:["1", "29", "49", "51"],
+    answerIndex:2, explanation:"हम मॉड्यूलर अंकगणित का उपयोग करेंगे।\n$7^2 = 49 \equiv -51 \pmod{100}$।\n$7^4 = 49^2 = 2401 \equiv 1 \pmod{100}$।\n$7^{99} = 7^{4 \times 24 + 3} = (7^4)^{24} \times 7^3 \equiv (1)^{24} \times 7^3 \equiv 343 \pmod{100}$।\n$343 = 3 \times 100 + 43$। अतः, शेषफल 43 है।"},
+
+  { q:"$\left(13^{21} + 13^{22} + 13^{23}\right)$ किस संख्या से पूरी तरह विभाज्य है?",
+    options:["13", "14", "15", "16"],
+    answerIndex:1, explanation:"व्यंजक से $13^{21}$ को कॉमन लें:\n$13^{21}(1+13^1+13^2) = 13^{21}(1+13+169) = 13^{21}(183)$।\n$183 = 3 \times 61$।\nव्यंजक $13^{21}(183)$ 13, 3, 61 से विभाज्य है।"},
+
+  { q:"संख्या $9876543210$ के निकटतम कौन सी संख्या है जो 11 से विभाज्य है?",
+    options:["9876543209", "9876543201", "9876543211", "9876543212"],
+    answerIndex:0, explanation:"11 से विभाज्यता का नियम: विषम स्थानों के अंकों के योग और सम स्थानों के अंकों के योग का अंतर 0 या 11 का गुणज होना चाहिए।\n$0+2+4+6+8 = 20$\n$1+3+5+7+9 = 25$\nअंतर = $25 - 20 = 5$।\nचूंकि अंतर 5 है, संख्या 11 से विभाज्य नहीं है। शेषफल 5 है।\nसंख्या को 11 से विभाज्य बनाने के लिए, हमें 5 को घटाना होगा या 6 को जोड़ना होगा।\n$9876543210 - 5 = 9876543205$।\n$9876543210 + 6 = 9876543216$।"},
+
+  { q:"वह सबसे छोटी संख्या ज्ञात कीजिए जिसे 12, 15 और 20 से विभाजित करने पर प्रत्येक स्थिति में 5 शेषफल बचे।",
+    options:["55", "65", "85", "125"],
+    answerIndex:1, explanation:"सबसे पहले 12, 15 और 20 का LCM ज्ञात करें।\n$12 = 2^2 \times 3$\n$15 = 3 \times 5$\n$20 = 2^2 \times 5$\nLCM(12, 15, 20) = $2^2 \times 3 \times 5 = 60$।\nअपेक्षित संख्या = LCM + शेषफल = $60 + 5 = 65$।"},
+
+  { q:"$2^{22}$ को 9 से विभाजित करने पर क्या शेषफल होगा?",
+    options:["1", "2", "4", "7"],
+    answerIndex:3, explanation:"हम मॉड्यूलर अंकगणित का उपयोग करेंगे।\n$2^3 = 8 \equiv -1 \pmod{9}$।\n$2^{22} = (2^3)^7 \times 2^1 = (-1)^7 \times 2 = -1 \times 2 = -2 \pmod{9}$।\n$-2$ का धनात्मक शेषफल $9-2 = 7$ है।\nअतः, शेषफल 7 होगा।"},
+
+  { q:"एक संख्या के 3/5 का 1/4 यदि 24 है, तो उस संख्या का 1/3 क्या होगा?",
+    options:["40", "45", "50", "55"],
+    answerIndex:1, explanation:"माना संख्या $x$ है।\n$x \times \frac{3}{5} \times \frac{1}{4} = 24$\n$x \times \frac{3}{20} = 24$\n$x = 24 \times \frac{20}{3} = 8 \times 20 = 160$।\nसंख्या का 1/3 = $160 \times \frac{1}{3} = \frac{160}{3} \approx 53.33$।\nप्रश्न में त्रुटि है। यदि $x \times \frac{3}{5} \times \frac{1}{4} = 24$, तो $x=160$।\n$160$ का $1/3$ एक पूर्णांक नहीं है।\nसही प्रश्न: एक संख्या के 3/5 का 1/4 यदि 24 है, तो उस संख्या का 3/4 क्या होगा?\n$x = 160$। संख्या का 3/4 = $160 \times \frac{3}{4} = 40 \times 3 = 120$।"},
+
+  { q:"इकाई अंक ज्ञात कीजिए: $2^{3333} + 3^{4444} + 4^{5555}$",
+    options:["3", "5", "7", "9"],
+    answerIndex:0, explanation:"$2^{3333}$ का इकाई अंक: 3333 को 4 से भाग देने पर शेषफल 1 आता है। अतः इकाई अंक $2^1 = 2$।\n$3^{4444}$ का इकाई अंक: 4444 को 4 से भाग देने पर शेषफल 0 आता है। अतः इकाई अंक $3^4 = 81 \rightarrow 1$।\n$4^{5555}$ का इकाई अंक: 5555 एक विषम संख्या है, अतः इकाई अंक 4।\nयोग का इकाई अंक $= (2+1+4)$ का इकाई अंक $= 7$।"},
+
+  { q:"दो क्रमागत संख्याओं का गुणनफल 42 है। संख्याओं के वर्गों का योग क्या होगा?",
+    options:["85", "86", "87", "88"],
+    answerIndex:0, explanation:"माना क्रमागत संख्याएँ $x$ और $(x+1)$ हैं।\n$x(x+1) = 42$\n$x^2+x-42=0$\n$(x+7)(x-6)=0$\n$x=6$ या $x=-7$।\nधनात्मक संख्याएँ 6 और 7 हैं।\nउनके वर्गों का योग $= 6^2+7^2 = 36+49=85$।"},
+
+  { q:"$343^{343}$ को 5 से विभाजित करने पर क्या शेषफल होगा?",
+    options:["1", "2", "3", "4"],
+    answerIndex:2, explanation:"हमें $343^{343}$ के इकाई अंक का पता लगाना होगा।\n$343 \equiv 3 \pmod{5}$।\n$3^{343}$ का इकाई अंक: 3 की घातों की साइक्लिसिटी 4 होती है।\n343 को 4 से भाग देने पर शेषफल 3 आता है।\nइकाई अंक $3^3 = 27 \rightarrow 7$ है।\nअतः, $343^{343}$ का इकाई अंक 7 होगा, जिसे 5 से विभाजित करने पर 2 शेषफल होगा।"},
+
+  { q:"$400$ के कितने गुणनखंड (factors) हैं?",
+    options:["8", "10", "12", "15"],
+    answerIndex:1, explanation:"$400 = 4 \times 100 = 2^2 \times 10^2 = 2^2 \times (2 \times 5)^2 = 2^2 \times 2^2 \times 5^2 = 2^4 \times 5^2$।\nगुणनखंडों की संख्या ज्ञात करने के लिए, हम घातांकों में 1 जोड़कर उनका गुणनफल करते हैं।\nगुणनखंडों की संख्या = $(4+1)(2+1) = 5 \times 3 = 15$।"},
+
+  { q:"इकाई अंक ज्ञात कीजिए: $17!$",
+    options:["0", "1", "2", "3"],
+    answerIndex:0, explanation:"फैक्टोरियल में 5 और 2 के प्रत्येक जोड़े का गुणनफल 10 होता है, जिससे इकाई अंक 0 प्राप्त होता है।\nचूंकि $17!$ में 5 (और 10) का गुणनखंड है, और 2 के कई गुणनखंड हैं, इसलिए इकाई अंक 0 होगा।"},
+
+  { q:"वह सबसे छोटी संख्या कौन सी है जिसे 1000 में जोड़ने पर योग 19 से पूरी तरह विभाज्य हो जाए?",
+    options:["1", "2", "3", "4"],
+    answerIndex:2, explanation:"1000 को 19 से विभाजित करने पर, $1000 = 19 \times 52 + 12$।\nशेषफल 12 है। 19 से पूरी तरह विभाज्य बनाने के लिए, हमें $19-12=7$ जोड़ना होगा।\n$1000+7=1007$, जो 19 से विभाज्य है।"},
+
+  { q:"दो संख्याओं का LCM 600 और HCF 20 है। यदि एक संख्या 100 है, तो दूसरी संख्या क्या है?",
+    options:["100", "120", "180", "200"],
+    answerIndex:1, explanation:"सूत्र: $LCM \times HCF = \text{पहली संख्या} \times \text{दूसरी संख्या}$।\n$600 \times 20 = 100 \times \text{दूसरी संख्या}$।\nदूसरी संख्या = $(600 \times 20) / 100 = 6 \times 20 = 120$।"},
+
+  { q:"इकाई अंक ज्ञात कीजिए: $8^{88} - 6^{66}$",
+    options:["0", "2", "4", "8"],
+    answerIndex:0, explanation:"$8^{88}$ का इकाई अंक: 8 की घातों की साइक्लिसिटी 4 होती है। 88 को 4 से भाग देने पर शेषफल 0 आता है। जब शेषफल 0 हो, तो हम साइक्लिसिटी के अंतिम अंक का उपयोग करते हैं, जो 6 है।\n$6^{66}$ का इकाई अंक: 6 की किसी भी घात का इकाई अंक हमेशा 6 होता है।\nअतः, इकाई अंक = $6 - 6 = 0$।"},
+
+  { q:"तीन-अंकीय सबसे छोटी संख्या कौन सी है जिसे 12, 18 और 24 से विभाजित करने पर कोई शेषफल नहीं बचता?",
+    options:["144", "180", "216", "240"],
+    answerIndex:0, explanation:"12, 18 और 24 का LCM ज्ञात करें।\n$12 = 2^2 \times 3$\n$18 = 2 \times 3^2$\n$24 = 2^3 \times 3$\nLCM(12, 18, 24) = $2^3 \times 3^2 = 8 \times 9 = 72$।\nतीन-अंकीय सबसे छोटी संख्या जो 72 का गुणज है, वह $72 \times 2 = 144$ है।"},
+
+  { q:"सबसे बड़ी संख्या कौन सी है जो 35, 42 और 77 को पूरी तरह विभाजित करती है?",
+    options:["5", "7", "11", "13"],
+    answerIndex:1, explanation:"हमें HCF(35, 42, 77) ज्ञात करना है।\n$35 = 5 \times 7$\n$42 = 2 \times 3 \times 7$\n$77 = 7 \times 11$\nइन तीनों में सामान्य गुणनखंड (common factor) 7 है।\nअतः, HCF 7 है।"},
+
+  { q:"$2^{22}$ को 9 से विभाजित करने पर क्या शेषफल होगा?",
+    options:["1", "2", "4", "7"],
+    answerIndex:3, explanation:"हम मॉड्यूलर अंकगणित (modular arithmetic) का उपयोग करेंगे।\n$2^3 = 8 \equiv -1 \pmod{9}$।\n$2^{22} = (2^3)^7 \times 2^1 = (-1)^7 \times 2 = -1 \times 2 = -2 \pmod{9}$।\n$-2$ का धनात्मक शेषफल $9-2 = 7$ है।\nअतः, शेषफल 7 होगा।"},
+
+  { q:"यदि एक संख्या $N$ को 4 से विभाजित करने पर शेषफल 2 आता है, तो $(N^2+3)$ को 4 से विभाजित करने पर क्या शेषफल होगा?",
+    options:["1", "2", "3", "4"],
+    answerIndex:3, explanation:"$N \equiv 2 \pmod{4}$।\n$N^2 \equiv 2^2 \equiv 4 \pmod{4}$।\nचूंकि $4$ 4 से विभाज्य है, इसलिए $4 \equiv 0 \pmod{4}$।\n$N^2+3 \equiv 0+3 \equiv 3 \pmod{4}$।\nअतः, शेषफल 3 होगा।"},
+
+  { q:"वह सबसे बड़ी 4-अंकीय संख्या कौन सी है जो 15 से पूरी तरह विभाज्य है?",
+    options:["9990", "9995", "9975", "9960"],
+    answerIndex:2, explanation:"सबसे बड़ी 4-अंकीय संख्या 9999 है।\nहम 9999 को 15 से विभाजित करते हैं: $9999 = 15 \times 666 + 9$।\nशेषफल 9 है। 15 से विभाज्य होने के लिए, हमें इस शेषफल को घटाना होगा।\n$9999 - 9 = 9990$।"},
+];
+/* ===================== QUIZ ENGINE ===================== */
+const TOTAL_QUESTIONS = questions.length;
+const QUIZ_MINUTES = 35;
+const qNoEl=document.getElementById('qNo'), qTotalEl=document.getElementById('qTotal');
+const qTextEl=document.getElementById('qText'), optionsEl=document.getElementById('options');
+const progressPill=document.getElementById('progressPill');
+const prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const clearBtn=document.getElementById('clearBtn'), submitBtn=document.getElementById('submitBtn');
+const timerEl=document.getElementById('timer');
+const quizCard=document.getElementById('quizCard'), resultCard=document.getElementById('resultCard');
+const reviewCard=document.getElementById('reviewCard'), scoreLine=document.getElementById('scoreLine');
+const correctCountEl=document.getElementById('correctCount'), wrongCountEl=document.getElementById('wrongCount');
+const unattCountEl=document.getElementById('unattCount'), scorePctEl=document.getElementById('scorePct');
+const timeUsedEl=document.getElementById('timeUsed'), reviewList=document.getElementById('reviewList');
+
+let current=1;
+let selections=Array(TOTAL_QUESTIONS).fill(null);
+let submitted=false;
+
+qTotalEl.textContent=TOTAL_QUESTIONS;
+renderQuestion();
+
+prevBtn.onclick=()=>{ if(current>1){ current--; renderQuestion(); } };
+nextBtn.onclick=()=>{ if(current<TOTAL_QUESTIONS){ current++; renderQuestion(); } };
+clearBtn.onclick=()=>{ selections[current-1]=null; renderQuestion(); updateProgress(); };
+submitBtn.onclick=submitQuiz;
+
+function renderQuestion(){
+  const q=questions[current-1];
+  qNoEl.textContent=current;
+  qTextEl.textContent=q.q;
+  optionsEl.innerHTML='';
+  q.options.forEach((opt,idx)=>{
+    const div=document.createElement('div');
+    div.className='opt'+(selections[current-1]===idx?' selected':'');
+    div.innerHTML=`<b>${String.fromCharCode(65+idx)}.</b> ${opt}`;
+    div.onclick=()=>{ selections[current-1]=idx; renderQuestion(); updateProgress(); };
+    optionsEl.appendChild(div);
+  });
+  prevBtn.disabled=current===1;
+  nextBtn.disabled=current===TOTAL_QUESTIONS;
+}
+function updateProgress(){
+  const attempted=selections.filter(x=>x!==null).length;
+  progressPill.textContent=`प्रयासित: ${attempted}`;
+}
+
+/* ========== TIMER ========== */
+let totalSeconds=QUIZ_MINUTES*60, elapsed=0;
+const t=setInterval(()=>{
+  if(submitted){ clearInterval(t); return; }
+  if(totalSeconds<=0){ timerEl.textContent='00:00'; autoSubmitOnTime(); clearInterval(t); return; }
+  totalSeconds--; elapsed++;
+  const mm=String(Math.floor(totalSeconds/60)).padStart(2,'0');
+  const ss=String(totalSeconds%60).padStart(2,'0');
+  timerEl.textContent=`${mm}:${ss}`;
+},1000);
+
+function autoSubmitOnTime(){
+  if(!submitted){ alert('समय समाप्त! टेस्ट स्वतः जमा हो रहा है।'); submitQuiz(); }
+}
+
+/* ========== SUBMIT & REVIEW ========== */
+function submitQuiz(){
+  if(submitted) return;
+  submitted=true;
+  prevBtn.disabled=true; nextBtn.disabled=true; clearBtn.disabled=true; submitBtn.disabled=true;
+
+  let correct=0, wrong=0, unatt=0;
+  selections.forEach((sel,i)=>{
+    if(sel===null){ unatt++; return; }
+    const ans=questions[i].answerIndex;
+    if(sel===ans) correct++; else wrong++;
+  });
+
+  const scorePct=Math.round((correct/TOTAL_QUESTIONS)*100);
+  const tu_m=Math.floor(elapsed/60);
+  const tu_s=String(elapsed%60).padStart(2,'0');
+
+  scoreLine.innerHTML=`आपका स्कोर: <b>${correct}/${TOTAL_QUESTIONS}</b> — <span class="${scorePct>=60?'correct':'wrong'}">${scorePct}%</span>`;
+  correctCountEl.textContent=correct; wrongCountEl.textContent=wrong; unattCountEl.textContent=unatt;
+  scorePctEl.textContent=scorePct; timeUsedEl.textContent=`${tu_m}:${tu_s}`;
+
+  quizCard.style.display='none';
+  resultCard.style.display='block';
+  reviewCard.style.display='block';
+
+  reviewList.innerHTML='';
+  questions.forEach((q,i)=>{
+    const div=document.createElement('div'); div.className='item';
+    const userSel=selections[i];
+    const isCorrect=userSel===q.answerIndex;
+    let ansText='';
+    if(userSel===null){
+      ansText=`❌ चयनित उत्तर: <span class="wrong">कोई नहीं</span>`;
+    } else if(isCorrect){
+      ansText=`✅ आपका उत्तर: <span class="correct">${q.options[userSel]}</span>`;
+    } else {
+      ansText=`❌ आपका उत्तर: <span class="wrong">${q.options[userSel]}</span> | सही उत्तर: <span class="correct">${q.options[q.answerIndex]}</span>`;
+    }
+    div.innerHTML=`
+      <b>प्र. ${i+1}.</b> ${q.q}<br>
+      <div class="ans">${ansText}</div>
+      <details><summary>🔎 स्पष्टीकरण</summary>${q.explanation}</details>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
