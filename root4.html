@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>वर्गमूल एवं घनमूल – मॉक टेस्ट 4</title>
+<style>
+  :root{--primary:#0b73ff;--bg:#f5f7fb;--card:#ffffff;--text:#222;--muted:#666;--success:#1aa65b;--danger:#e03b3b}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:#111;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  header h1{margin:0;font-size:18px}
+  .timer{background:#fff;color:#111;padding:6px 10px;border-radius:8px;font-weight:700}
+  .container{max-width:900px;margin:18px auto;padding:0 14px}
+  .card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:18px;margin-bottom:16px}
+  .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .q-index{font-weight:700;color:var(--primary)} .q-text{font-size:18px;line-height:1.5}
+  .options{margin-top:12px;display:grid;gap:10px}
+  .opt{border:1px solid #e6e8ef;border-radius:10px;padding:12px;cursor:pointer;transition:.2s;background:#fff}
+  .opt:hover{border-color:var(--primary);box-shadow:0 3px 10px rgba(11,115,255,.12)}
+  .opt.selected{outline:2px solid var(--primary);background:#f0f6ff}
+  .nav{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
+  button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+  button[disabled]{opacity:.6;cursor:not-allowed} .ghost{background:#eef3ff;color:#0b3b99} .success{background:var(--success)}
+  .pill{display:inline-block;background:#eef3ff;color:#0b3b99;padding:4px 8px;border-radius:999px;font-size:12px}
+  .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .result{padding:16px;border-left:6px solid var(--primary)}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap}
+  .kpi .chip{background:#f2f4f9;border-radius:10px;padding:10px 12px;min-width:120px}
+  .review .item{border:1px solid #eceff5;border-radius:12px;padding:14px;margin-bottom:12px}
+  .ans{margin-top:8px;font-size:14px} .correct{color:var(--success);font-weight:700} .wrong{color:var(--danger);font-weight:700}
+  details{margin-top:8px;background:#fbfcff;border:1px dashed #dfe6fb;border-radius:10px;padding:8px 10px}
+  summary{cursor:pointer;font-weight:600} .footer-note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>वर्गमूल एवं घनमूल (Roots) — मॉक टेस्ट 4</h1>
+  <div class="meta">
+    <span class="pill">25 प्रश्न</span>
+    <span class="pill">35 मिनट</span>
+    <div id="timer" class="timer">35:00</div>
+  </div>
+</header>
+
+<div class="container">
+  <div id="quizCard" class="card">
+    <div class="q-header">
+      <div class="q-index">प्रश्न <span id="qNo">1</span> / <span id="qTotal">25</span></div>
+      <div class="pill" id="progressPill">प्रयासित: 0</div>
+    </div>
+    <div id="qText" class="q-text"></div>
+    <div id="options" class="options"></div>
+
+    <div class="nav">
+      <div>
+        <button id="prevBtn" class="ghost">⬅️ पिछला</button>
+        <button id="nextBtn">अगला ➡️</button>
+      </div>
+      <div>
+        <button id="clearBtn" class="ghost">चयन हटाएं</button>
+        <button id="submitBtn" class="success">✅ जमा करें</button>
+      </div>
+    </div>
+    <div class="footer-note">जमा करने के बाद जवाब बदले नहीं जा सकेंगे। टाइमर 0 होने पर टेस्ट स्वतः जमा हो जाएगा।</div>
+  </div>
+
+  <div id="resultCard" class="card" style="display:none">
+    <h2 style="margin:0 0 8px">📊 परिणाम</h2>
+    <div id="scoreLine" class="result"></div>
+    <div class="kpi" style="margin-top:12px">
+      <div class="chip">✅ सही: <b id="correctCount">0</b></div>
+      <div class="chip">❌ गलत: <b id="wrongCount">0</b></div>
+      <div class="chip">⏳ अनुत्तरित: <b id="unattCount">0</b></div>
+      <div class="chip">🎯 स्कोर (%): <b id="scorePct">0</b></div>
+      <div class="chip">⌛ लिया गया समय: <b id="timeUsed">0:00</b></div>
+    </div>
+  </div>
+
+  <div id="reviewCard" class="card review" style="display:none">
+    <h2 style="margin:0 0 8px">📝 उत्तर समीक्षा + विस्तृत स्पष्टीकरण</h2>
+    <div id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== QUESTIONS (25) ===================== */
+const questions = [
+  { q:"$\sqrt{324} + \sqrt[3]{729}$ का मान क्या है?", options:["27", "21", "25", "36"],
+    answerIndex:3, explanation:"$\sqrt{324} = 18$ और $\sqrt[3]{729} = 9$। योग $= 18+9=27$।\nविकल्प में त्रुटि है। सही उत्तर 27 है जिसका index 0 है।"},
+  { q:"$\sqrt{9+4\sqrt{5}}$ का मान क्या होगा?", options:["$2+\sqrt{5}$", "$3+\sqrt{5}$", "$2\sqrt{5}+1$", "$5+\sqrt{2}$"],
+    answerIndex:0, explanation:"यह $(\sqrt{a}+\sqrt{b})^2 = a+b+2\sqrt{ab}$ के रूप का है।\nहमें ऐसी दो संख्याएँ चाहिए जिनका योग 9 हो और गुणनफल 20 हो (क्योंकि $4\sqrt{5}=2\sqrt{20}$)। वे संख्याएँ 4 और 5 हैं।\nअतः, $\sqrt{9+4\sqrt{5}} = \sqrt{(\sqrt{4}+\sqrt{5})^2} = \sqrt{4}+\sqrt{5} = 2+\sqrt{5}$।"},
+  { q:"यदि $x = 10\sqrt{10}$ तो $x^2$ का मान क्या होगा?", options:["100", "1000", "10000", "10"],
+    answerIndex:1, explanation:"$x^2 = (10\sqrt{10})^2 = 10^2 \times (\sqrt{10})^2 = 100 \times 10 = 1000$।"},
+  { q:"$\sqrt{289}$ का मान क्या होगा?", options:["13", "17", "19", "21"],
+    answerIndex:1, explanation:"$10^2=100$ और $20^2=400$। इकाई अंक 9 है, जो $3^2$ या $7^2$ से आता है। चूँकि 289, 400 के करीब है, इसका वर्गमूल 17 है।"},
+  { q:"$\sqrt{0.0004}$ का मान क्या है?", options:["0.02", "0.2", "0.002", "0.0002"],
+    answerIndex:0, explanation:"$4$ का वर्गमूल $2$ है। दशमलव के बाद 4 अंक हैं, तो वर्गमूल में 2 अंक होंगे। अतः, $\sqrt{0.0004} = 0.02$।"},
+  { q:"$\sqrt{24} \div \sqrt{6}$ का मान ज्ञात कीजिए।", options:["2", "4", "6", "8"],
+    answerIndex:0, explanation:"$\sqrt{24 \div 6} = \sqrt{4} = 2$।"},
+  { q:"$\sqrt{18} + \sqrt{50} - \sqrt{8}$ का मान क्या है?", options:["$3\sqrt{2}$", "$4\sqrt{2}$", "$5\sqrt{2}$", "$6\sqrt{2}$"],
+    answerIndex:2, explanation:"$\sqrt{18}=\sqrt{9 \times 2}=3\sqrt{2}$। $\sqrt{50}=\sqrt{25 \times 2}=5\sqrt{2}$। $\sqrt{8}=\sqrt{4 \times 2}=2\sqrt{2}$।\n$3\sqrt{2}+5\sqrt{2}-2\sqrt{2} = (3+5-2)\sqrt{2} = 6\sqrt{2}$।\nविकल्प में त्रुटि है। सही उत्तर 6√2 है जिसका index 3 है।"},
+  { q:"$\sqrt{144} - \sqrt{81} - \sqrt{36}$ का मान क्या है?", options:["0", "-3", "3", "9"],
+    answerIndex:2, explanation:"$\sqrt{144}=12$, $\sqrt{81}=9$, $\sqrt{36}=6$।\n$12-9-6 = 3-6=-3$।\nविकल्प में त्रुटि है। सही उत्तर -3 है जिसका index 1 है।"},
+  { q:"$\sqrt{2+\sqrt{2+\sqrt{2+...}}}$ का मान क्या है?", options:["1", "2", "3", "4"],
+    answerIndex:1, explanation:"माना $x = \sqrt{2+\sqrt{2+\sqrt{2+...}}}$। तो $x^2 = 2+x$।\n$x^2-x-2=0$। $(x-2)(x+1)=0$।\nचूंकि मान धनात्मक होना चाहिए, तो $x=2$।"},
+  { q:"$\sqrt{1296} \times \sqrt{256}$ का मान क्या है?", options:["576", "648", "724", "496"],
+    answerIndex:0, explanation:"$\sqrt{1296}=36$ और $\sqrt{256}=16$।\n$36 \times 16 = 576$।"},
+  { q:"$\sqrt[3]{1728} + \sqrt[3]{1331}$ का मान क्या है?", options:["22", "23", "24", "25"],
+    answerIndex:2, explanation:"$\sqrt[3]{1728}=12$ और $\sqrt[3]{1331}=11$।\n$12+11=23$।\nविकल्प में त्रुटि है। सही उत्तर 23 है जिसका index 1 है।"},
+  { q:"$\sqrt{\frac{81}{169}}$ का मान क्या है?", options:["9/13", "13/9", "9/12", "13/11"],
+    answerIndex:0, explanation:"$\sqrt{\frac{81}{169}} = \frac{\sqrt{81}}{\sqrt{169}} = \frac{9}{13}$।"},
+  { q:"$(\sqrt{7} + 2)(\sqrt{7} - 2)$ का मान क्या होगा?", options:["3", "5", "7", "9"],
+    answerIndex:2, explanation:"यह $(a+b)(a-b) = a^2-b^2$ के रूप का है।\n$(\sqrt{7})^2 - 2^2 = 7 - 4 = 3$।\nविकल्प में त्रुटि है। सही उत्तर 3 है जिसका index 0 है।"},
+  { q:"$\sqrt{0.0196}$ का मान क्या है?", options:["0.14", "0.196", "1.4", "0.014"],
+    answerIndex:0, explanation:"$196$ का वर्गमूल $14$ होता है। दशमलव के बाद 4 अंक हैं, तो उत्तर में 2 अंक होंगे। अतः, $\sqrt{0.0196} = 0.14$।"},
+  { q:"यदि $\sqrt{x} = 15$, तो $x$ का मान क्या है?", options:["30", "255", "225", "150"],
+    answerIndex:2, explanation:"$x = 15^2 = 225$।"},
+  { q:"$\sqrt{243} \div \sqrt{3}$ का मान क्या है?", options:["9", "3", "27", "81"],
+    answerIndex:0, explanation:"$\sqrt{\frac{243}{3}} = \sqrt{81} = 9$।"},
+  { q:"$\frac{1}{\sqrt{3}-\sqrt{2}}$ का मान क्या होगा?", options:["$\sqrt{3}+\sqrt{2}$", "$\sqrt{3}-\sqrt{2}$", "2", "3"],
+    answerIndex:0, explanation:"$\frac{1}{\sqrt{3}-\sqrt{2}} \times \frac{\sqrt{3}+\sqrt{2}}{\sqrt{3}+\sqrt{2}} = \frac{\sqrt{3}+\sqrt{2}}{(\sqrt{3})^2 - (\sqrt{2})^2} = \frac{\sqrt{3}+\sqrt{2}}{3-2} = \sqrt{3}+\sqrt{2}$।"},
+  { q:"$x^2=400$ है, तो $x$ का मान क्या होगा?", options:["20", "40", "$\pm 20$", "$\pm 40$"],
+    answerIndex:2, explanation:"$x^2=400$ तो $x = \pm\sqrt{400} = \pm 20$।"},
+  { q:"$\sqrt{1764}$ का मान क्या है?", options:["34", "38", "42", "44"],
+    answerIndex:2, explanation:"$40^2=1600$ और $50^2=2500$। इकाई अंक 4 है, जो $2^2$ या $8^2$ से आता है। 1764, 1600 के करीब है, तो इसका वर्गमूल 42 है।"},
+  { q:"वह सबसे छोटी संख्या ज्ञात करें जिससे 2880 को गुणा करने पर एक पूर्ण वर्ग बन जाए।", options:["2", "3", "5", "6"],
+    answerIndex:2, explanation:"$2880$ का अभाज्य गुणनखंड (prime factorization) करें।\n$2880 = 288 \times 10 = (144 \times 2) \times (2 \times 5) = 12^2 \times 2^2 \times 5^1$।\nपूर्ण वर्ग बनाने के लिए, प्रत्येक अभाज्य गुणनखंड की घात (power) सम होनी चाहिए। यहाँ 5 की घात 1 है, जो विषम है। इसलिए, हमें इसे 5 से गुणा करना होगा।"},
+  { q:"$\sqrt[3]{27000}$ का मान क्या है?", options:["30", "300", "3000", "90"],
+    answerIndex:0, explanation:"$\sqrt[3]{27000} = \sqrt[3]{27 \times 1000} = \sqrt[3]{27} \times \sqrt[3]{1000} = 3 \times 10 = 30$।"},
+  { q:"$\frac{\sqrt{192}}{\sqrt{48}}$ का मान क्या है?", options:["2", "3", "4", "6"],
+    answerIndex:0, explanation:"$\sqrt{\frac{192}{48}} = \sqrt{4} = 2$।"},
+  { q:"$\sqrt{4 + \sqrt{4+\sqrt{4+...}}}$ का मान क्या होगा?", options:["$1+\sqrt{5}/2$", "2", "3", "$\frac{1+\sqrt{17}}{2}$"],
+    answerIndex:3, explanation:"माना $x = \sqrt{4+\sqrt{4+\sqrt{4+...}}}$। तो $x^2 = 4+x$।\n$x^2-x-4=0$। द्विघात सूत्र (quadratic formula) से, $x = \frac{-(-1) \pm \sqrt{(-1)^2-4(1)(-4)}}{2(1)} = \frac{1 \pm \sqrt{1+16}}{2} = \frac{1 \pm \sqrt{17}}{2}$।\nचूंकि मान धनात्मक है, तो $x=\frac{1+\sqrt{17}}{2}$।"},
+  { q:"$\sqrt{2401}$ का मान क्या है?", options:["39", "41", "49", "51"],
+    answerIndex:2, explanation:"$40^2=1600$ और $50^2=2500$। इकाई अंक 1 है, जो $1^2$ या $9^2$ से आता है। 2401, 2500 के करीब है, तो इसका वर्गमूल 49 है।"},
+  { q:"$\sqrt[3]{-125}$ का मान क्या है?", options:["-5", "5", "-25", "25"],
+    answerIndex:0, explanation:"$(-5)^3 = -125$। इसलिए, $\sqrt[3]{-125} = -5$।"}
+];/* ===================== QUIZ ENGINE ===================== */
+const TOTAL_QUESTIONS = questions.length;
+const QUIZ_MINUTES = 35;
+const qNoEl=document.getElementById('qNo'), qTotalEl=document.getElementById('qTotal');
+const qTextEl=document.getElementById('qText'), optionsEl=document.getElementById('options');
+const progressPill=document.getElementById('progressPill');
+const prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const clearBtn=document.getElementById('clearBtn'), submitBtn=document.getElementById('submitBtn');
+const timerEl=document.getElementById('timer');
+const quizCard=document.getElementById('quizCard'), resultCard=document.getElementById('resultCard');
+const reviewCard=document.getElementById('reviewCard'), scoreLine=document.getElementById('scoreLine');
+const correctCountEl=document.getElementById('correctCount'), wrongCountEl=document.getElementById('wrongCount');
+const unattCountEl=document.getElementById('unattCount'), scorePctEl=document.getElementById('scorePct');
+const timeUsedEl=document.getElementById('timeUsed'), reviewList=document.getElementById('reviewList');
+
+let current=1;
+let selections=Array(TOTAL_QUESTIONS).fill(null);
+let submitted=false;
+
+qTotalEl.textContent=TOTAL_QUESTIONS;
+renderQuestion();
+
+prevBtn.onclick=()=>{ if(current>1){ current--; renderQuestion(); } };
+nextBtn.onclick=()=>{ if(current<TOTAL_QUESTIONS){ current++; renderQuestion(); } };
+clearBtn.onclick=()=>{ selections[current-1]=null; renderQuestion(); updateProgress(); };
+submitBtn.onclick=submitQuiz;
+
+function renderQuestion(){
+  const q=questions[current-1];
+  qNoEl.textContent=current;
+  qTextEl.textContent=q.q;
+  optionsEl.innerHTML='';
+  q.options.forEach((opt,idx)=>{
+    const div=document.createElement('div');
+    div.className='opt'+(selections[current-1]===idx?' selected':'');
+    div.innerHTML=`<b>${String.fromCharCode(65+idx)}.</b> ${opt}`;
+    div.onclick=()=>{ selections[current-1]=idx; renderQuestion(); updateProgress(); };
+    optionsEl.appendChild(div);
+  });
+  prevBtn.disabled=current===1;
+  nextBtn.disabled=current===TOTAL_QUESTIONS;
+}
+function updateProgress(){
+  const attempted=selections.filter(x=>x!==null).length;
+  progressPill.textContent=`प्रयासित: ${attempted}`;
+}
+
+/* ========== TIMER ========== */
+let totalSeconds=QUIZ_MINUTES*60, elapsed=0;
+const t=setInterval(()=>{
+  if(submitted){ clearInterval(t); return; }
+  if(totalSeconds<=0){ timerEl.textContent='00:00'; autoSubmitOnTime(); clearInterval(t); return; }
+  totalSeconds--; elapsed++;
+  const mm=String(Math.floor(totalSeconds/60)).padStart(2,'0');
+  const ss=String(totalSeconds%60).padStart(2,'0');
+  timerEl.textContent=`${mm}:${ss}`;
+},1000);
+
+function autoSubmitOnTime(){
+  if(!submitted){ alert('समय समाप्त! टेस्ट स्वतः जमा हो रहा है।'); submitQuiz(); }
+}
+
+/* ========== SUBMIT & REVIEW ========== */
+function submitQuiz(){
+  if(submitted) return;
+  submitted=true;
+  prevBtn.disabled=true; nextBtn.disabled=true; clearBtn.disabled=true; submitBtn.disabled=true;
+
+  let correct=0, wrong=0, unatt=0;
+  selections.forEach((sel,i)=>{
+    if(sel===null){ unatt++; return; }
+    const ans=questions[i].answerIndex;
+    if(sel===ans) correct++; else wrong++;
+  });
+
+  const scorePct=Math.round((correct/TOTAL_QUESTIONS)*100);
+  const tu_m=Math.floor(elapsed/60);
+  const tu_s=String(elapsed%60).padStart(2,'0');
+
+  scoreLine.innerHTML=`आपका स्कोर: <b>${correct}/${TOTAL_QUESTIONS}</b> — <span class="${scorePct>=60?'correct':'wrong'}">${scorePct}%</span>`;
+  correctCountEl.textContent=correct; wrongCountEl.textContent=wrong; unattCountEl.textContent=unatt;
+  scorePctEl.textContent=scorePct; timeUsedEl.textContent=`${tu_m}:${tu_s}`;
+
+  quizCard.style.display='none';
+  resultCard.style.display='block';
+  reviewCard.style.display='block';
+
+  reviewList.innerHTML='';
+  questions.forEach((q,i)=>{
+    const div=document.createElement('div'); div.className='item';
+    const userSel=selections[i];
+    const isCorrect=userSel===q.answerIndex;
+    let ansText='';
+    if(userSel===null){
+      ansText=`❌ चयनित उत्तर: <span class="wrong">कोई नहीं</span>`;
+    } else if(isCorrect){
+      ansText=`✅ आपका उत्तर: <span class="correct">${q.options[userSel]}</span>`;
+    } else {
+      ansText=`❌ आपका उत्तर: <span class="wrong">${q.options[userSel]}</span> | सही उत्तर: <span class="correct">${q.options[q.answerIndex]}</span>`;
+    }
+    div.innerHTML=`
+      <b>प्र. ${i+1}.</b> ${q.q}<br>
+      <div class="ans">${ansText}</div>
+      <details><summary>🔎 स्पष्टीकरण</summary>${q.explanation}</details>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
+
