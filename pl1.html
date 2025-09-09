@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>लाभ और हानि – मॉक टेस्ट 1</title>
+<style>
+  :root{--primary:#0b73ff;--bg:#f5f7fb;--card:#ffffff;--text:#222;--muted:#666;--success:#1aa65b;--danger:#e03b3b}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:#111;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  header h1{margin:0;font-size:18px}
+  .timer{background:#fff;color:#111;padding:6px 10px;border-radius:8px;font-weight:700}
+  .container{max-width:900px;margin:18px auto;padding:0 14px}
+  .card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:18px;margin-bottom:16px}
+  .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .q-index{font-weight:700;color:var(--primary)} .q-text{font-size:18px;line-height:1.5}
+  .options{margin-top:12px;display:grid;gap:10px}
+  .opt{border:1px solid #e6e8ef;border-radius:10px;padding:12px;cursor:pointer;transition:.2s;background:#fff}
+  .opt:hover{border-color:var(--primary);box-shadow:0 3px 10px rgba(11,115,255,.12)}
+  .opt.selected{outline:2px solid var(--primary);background:#f0f6ff}
+  .nav{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;margin-top:12px}
+  button{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}
+  button[disabled]{opacity:.6;cursor:not-allowed} .ghost{background:#eef3ff;color:#0b3b99} .success{background:var(--success)}
+  .pill{display:inline-block;background:#eef3ff;color:#0b3b99;padding:4px 8px;border-radius:999px;font-size:12px}
+  .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .result{padding:16px;border-left:6px solid var(--primary)}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap}
+  .kpi .chip{background:#f2f4f9;border-radius:10px;padding:10px 12px;min-width:120px}
+  .review .item{border:1px solid #eceff5;border-radius:12px;padding:14px;margin-bottom:12px}
+  .ans{margin-top:8px;font-size:14px} .correct{color:var(--success);font-weight:700} .wrong{color:var(--danger);font-weight:700}
+  details{margin-top:8px;background:#fbfcff;border:1px dashed #dfe6fb;border-radius:10px;padding:8px 10px}
+  summary{cursor:pointer;font-weight:600} .footer-note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>लाभ और हानि (Profit & Loss) — मॉक टेस्ट 1</h1>
+  <div class="meta">
+    <span class="pill">25 प्रश्न</span>
+    <span class="pill">35 मिनट</span>
+    <div id="timer" class="timer">35:00</div>
+  </div>
+</header>
+
+<div class="container">
+  <div id="quizCard" class="card">
+    <div class="q-header">
+      <div class="q-index">प्रश्न <span id="qNo">1</span> / <span id="qTotal">25</span></div>
+      <div class="pill" id="progressPill">प्रयासित: 0</div>
+    </div>
+    <div id="qText" class="q-text"></div>
+    <div id="options" class="options"></div>
+
+    <div class="nav">
+      <div>
+        <button id="prevBtn" class="ghost">⬅️ पिछला</button>
+        <button id="nextBtn">अगला ➡️</button>
+      </div>
+      <div>
+        <button id="clearBtn" class="ghost">चयन हटाएं</button>
+        <button id="submitBtn" class="success">✅ जमा करें</button>
+      </div>
+    </div>
+    <div class="footer-note">जमा करने के बाद जवाब बदले नहीं जा सकेंगे। टाइमर 0 होने पर टेस्ट स्वतः जमा हो जाएगा।</div>
+  </div>
+
+  <div id="resultCard" class="card" style="display:none">
+    <h2 style="margin:0 0 8px">📊 परिणाम</h2>
+    <div id="scoreLine" class="result"></div>
+    <div class="kpi" style="margin-top:12px">
+      <div class="chip">✅ सही: <b id="correctCount">0</b></div>
+      <div class="chip">❌ गलत: <b id="wrongCount">0</b></div>
+      <div class="chip">⏳ अनुत्तरित: <b id="unattCount">0</b></div>
+      <div class="chip">🎯 स्कोर (%): <b id="scorePct">0</b></div>
+      <div class="chip">⌛ लिया गया समय: <b id="timeUsed">0:00</b></div>
+    </div>
+  </div>
+
+  <div id="reviewCard" class="card review" style="display:none">
+    <h2 style="margin:0 0 8px">📝 उत्तर समीक्षा + विस्तृत स्पष्टीकरण</h2>
+    <div id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== QUESTIONS (25) ===================== */
+const questions = [
+  { q:"एक वस्तु ₹500 में खरीदी गई और ₹600 में बेची गई। लाभ प्रतिशत क्या है?", options:["10%", "15%", "20%", "25%"],
+    answerIndex:2, explanation:"क्रय मूल्य (CP) = ₹500। विक्रय मूल्य (SP) = ₹600। लाभ = SP - CP = 600 - 500 = ₹100।\nलाभ प्रतिशत = (लाभ / CP) × 100 = (100 / 500) × 100 = 20%।"},
+  { q:"एक दुकानदार ने एक कुर्सी ₹800 में खरीदी और ₹720 में बेची। हानि प्रतिशत क्या है?", options:["8%", "10%", "12%", "15%"],
+    answerIndex:1, explanation:"क्रय मूल्य (CP) = ₹800। विक्रय मूल्य (SP) = ₹720। हानि = CP - SP = 800 - 720 = ₹80।\nहानि प्रतिशत = (हानि / CP) × 100 = (80 / 800) × 100 = 10%।"},
+  { q:"यदि एक वस्तु को ₹1,200 में बेचने पर 20% का लाभ होता है, तो उसका क्रय मूल्य (CP) क्या था?", options:["₹960", "₹1,000", "₹1,100", "₹1,440"],
+    answerIndex:1, explanation:"विक्रय मूल्य (SP) = ₹1,200। लाभ प्रतिशत = 20%।\nक्रय मूल्य (CP) = SP / (1 + 20/100) = 1200 / 1.2 = ₹1,000।"},
+  { q:"एक घड़ी को 10% की हानि पर ₹450 में बेचा गया। उसका क्रय मूल्य क्या है?", options:["₹400", "₹495", "₹500", "₹550"],
+    answerIndex:2, explanation:"विक्रय मूल्य (SP) = ₹450। हानि प्रतिशत = 10%।\nक्रय मूल्य (CP) = SP / (1 - 10/100) = 450 / 0.9 = ₹500।"},
+  { q:"₹200 की वस्तु पर 15% की छूट दी गई, तो उसका विक्रय मूल्य (SP) क्या होगा?", options:["₹170", "₹175", "₹180", "₹185"],
+    answerIndex:0, explanation:"अंकित मूल्य (MP) = ₹200। छूट प्रतिशत = 15%।\nछूट राशि = 200 × (15/100) = ₹30।\nविक्रय मूल्य (SP) = MP - छूट = 200 - 30 = ₹170।"},
+  { q:"यदि कोई वस्तु ₹400 में बेचने पर 20% की हानि होती है, तो 10% का लाभ कमाने के लिए उसे किस मूल्य पर बेचा जाना चाहिए?", options:["₹450", "₹500", "₹550", "₹600"],
+    answerIndex:2, explanation:"पहले CP ज्ञात करें: CP = ₹400 / (1 - 20/100) = 400 / 0.8 = ₹500।\n10% का लाभ कमाने के लिए विक्रय मूल्य (SP) = 500 × (1 + 10/100) = 500 × 1.1 = ₹550।"},
+  { q:"एक दुकानदार 10% का लाभ कमाने के लिए एक वस्तु को ₹220 में बेचता है। 20% का लाभ कमाने के लिए उसे किस मूल्य पर बेचना चाहिए?", options:["₹230", "₹240", "₹250", "₹260"],
+    answerIndex:1, explanation:"पहले CP ज्ञात करें: CP = ₹220 / (1 + 10/100) = 220 / 1.1 = ₹200।\nअब 20% लाभ पर SP ज्ञात करें: SP = ₹200 × (1 + 20/100) = 200 × 1.2 = ₹240।"},
+  { q:"यदि किसी वस्तु का क्रय मूल्य (CP) ₹2,000 है और उसे 30% लाभ पर बेचा जाता है, तो विक्रय मूल्य (SP) क्या होगा?", options:["₹2,300", "₹2,400", "₹2,500", "₹2,600"],
+    answerIndex:3, explanation:"विक्रय मूल्य (SP) = CP × (1 + 30/100) = 2000 × 1.3 = ₹2,600।"},
+  { q:"एक बेईमान दुकानदार अपनी वस्तुएं क्रय मूल्य पर बेचने का दावा करता है, लेकिन 1 किलो की जगह 800 ग्राम का वजन इस्तेमाल करता है। उसका लाभ प्रतिशत क्या है?", options:["10%", "15%", "20%", "25%"],
+    answerIndex:3, explanation:"दुकानदार का लाभ = (वास्तविक वजन - उपयोग किया गया वजन) = 1000 - 800 = 200 ग्राम।\nलाभ की गणना बेचे गए वजन पर की जाती है। लाभ प्रतिशत = (लाभ / उपयोग किया गया वजन) × 100 = (200 / 800) × 100 = 25%।"},
+  { q:"एक वस्तु को 10% की हानि के बदले 10% के लाभ पर बेचा जाए तो ₹500 अधिक मिलते हैं। वस्तु का क्रय मूल्य क्या है?", options:["₹2,000", "₹2,250", "₹2,500", "₹3,000"],
+    answerIndex:2, explanation:"10% हानि और 10% लाभ के बीच कुल अंतर = 10% + 10% = 20%।\nयह 20% ही ₹500 के बराबर है।\nतो, क्रय मूल्य (CP) = (500 / 20) × 100 = 25 × 100 = ₹2,500।"},
+  { q:"एक वस्तु को 15% की हानि पर ₹340 में बेचा गया। 20% का लाभ प्राप्त करने के लिए उसे किस मूल्य पर बेचना चाहिए?", options:["₹400", "₹480", "₹500", "₹520"],
+    answerIndex:1, explanation:"पहले CP ज्ञात करें: CP = ₹340 / (1 - 15/100) = 340 / 0.85 = ₹400।\n20% का लाभ प्राप्त करने के लिए SP = ₹400 × (1 + 20/100) = 400 × 1.2 = ₹480।"},
+  { q:"यदि कोई दुकानदार एक वस्तु को 15% की हानि पर बेचता है, तो उसका क्रय मूल्य (CP) क्या था यदि उसने उसे ₹1,700 में बेचा?", options:["₹1,800", "₹1,900", "₹2,000", "₹2,100"],
+    answerIndex:2, explanation:"क्रय मूल्य (CP) = SP / (1 - 15/100) = 1700 / 0.85 = ₹2,000।"},
+  { q:"किसी वस्तु का क्रय मूल्य (CP) ₹1,500 है। उसे 20% लाभ पर बेचा जाता है। विक्रय मूल्य (SP) क्या होगा?", options:["₹1,600", "₹1,700", "₹1,800", "₹1,900"],
+    answerIndex:2, explanation:"विक्रय मूल्य (SP) = CP × (1 + 20/100) = 1500 × 1.2 = ₹1,800।"},
+  { q:"एक दुकानदार एक वस्तु ₹600 में खरीदता है और ₹750 में बेचता है। लाभ या हानि प्रतिशत क्या है?", options:["20% लाभ", "25% लाभ", "20% हानि", "25% हानि"],
+    answerIndex:1, explanation:"लाभ = 750 - 600 = ₹150।\nलाभ प्रतिशत = (150 / 600) × 100 = 25%।"},
+  { q:"यदि एक वस्तु को ₹8,000 में बेचने पर 20% का लाभ होता है, तो उसका क्रय मूल्य क्या था?", options:["₹6,000", "₹6,400", "₹6,600", "₹7,000"],
+    answerIndex:1, explanation:"क्रय मूल्य (CP) = SP / (1 + 20/100) = 8000 / 1.25 = ₹6,400।"},
+  { q:"एक वस्तु का क्रय मूल्य (CP) ₹400 है। यदि उसे 10% लाभ पर बेचा जाता है और यह अंकित मूल्य पर 20% की छूट देने के बाद होता है, तो अंकित मूल्य (MP) क्या है?", options:["₹450", "₹500", "₹550", "₹600"],
+    answerIndex:2, explanation:"पहले SP ज्ञात करें: SP = CP × (1 + 10/100) = 400 × 1.1 = ₹440।\nअब MP ज्ञात करें: MP = SP / (1 - 20/100) = 440 / 0.8 = ₹550।"},
+  { q:"एक दुकानदार 20% लाभ पर एक टीवी ₹6,000 में बेचता है। 20% हानि पर बेचे तो क्या विक्रय मूल्य होगा?", options:["₹3,800", "₹4,000", "₹4,200", "₹4,500"],
+    answerIndex:1, explanation:"पहले CP ज्ञात करें: CP = ₹6000 / (1 + 20/100) = 6000 / 1.2 = ₹5,000।\nअब 20% हानि पर SP ज्ञात करें: SP = ₹5,000 × (1 - 20/100) = 5000 × 0.8 = ₹4,000।"},
+  { q:"₹1,000 पर 25% और 10% की क्रमिक छूट के बाद विक्रय मूल्य क्या होगा?", options:["₹650", "₹675", "₹700", "₹750"],
+    answerIndex:1, explanation:"पहला छूट = 1000 × (25/100) = ₹250। कीमत = 1000 - 250 = ₹750।\nदूसरा छूट = 750 × (10/100) = ₹75। अंतिम विक्रय मूल्य = 750 - 75 = ₹675।"},
+  { q:"एक वस्तु का CP ₹800 है। यदि 25% हानि पर बेचे तो हानि की राशि क्या होगी?", options:["₹150", "₹180", "₹200", "₹220"],
+    answerIndex:2, explanation:"हानि की राशि = CP × (हानि%/100) = 800 × (25/100) = ₹200।"},
+  { q:"एक वस्तु को 15% लाभ पर ₹460 में बेचा जाता है। इसका क्रय मूल्य क्या है?", options:["₹350", "₹380", "₹400", "₹420"],
+    answerIndex:2, explanation:"क्रय मूल्य (CP) = SP / (1 + 15/100) = 460 / 1.15 = ₹400।"},
+  { q:"एक वस्तु को ₹1,800 में बेचने पर 10% की हानि होती है। 10% लाभ के लिए SP क्या होगा?", options:["₹2,000", "₹2,100", "₹2,200", "₹2,400"],
+    answerIndex:2, explanation:"पहले CP ज्ञात करें: CP = ₹1800 / (1 - 10/100) = 1800 / 0.9 = ₹2,000।\n10% लाभ के लिए SP = ₹2,000 × (1 + 10/100) = 2000 × 1.1 = ₹2,200।"},
+  { q:"यदि 10 वस्तुओं का क्रय मूल्य 8 वस्तुओं के विक्रय मूल्य के बराबर है, तो लाभ या हानि प्रतिशत क्या है?", options:["20% लाभ", "25% लाभ", "20% हानि", "25% हानि"],
+    answerIndex:1, explanation:"10CP = 8SP।\nSP/CP = 10/8 = 5/4।\nSP, CP से अधिक है, इसलिए यह लाभ है। लाभ प्रतिशत = ((SP-CP)/CP) × 100 = ((5-4)/4) × 100 = (1/4) × 100 = 25%।"},
+  { q:"एक व्यापारी अपनी वस्तुओं पर 40% अधिक मूल्य अंकित करता है और फिर 25% की छूट देता है। उसका लाभ या हानि प्रतिशत क्या है?", options:["5% लाभ", "10% लाभ", "5% हानि", "10% हानि"],
+    answerIndex:0, explanation:"माना CP = ₹100। अंकित मूल्य (MP) = 100 + 40% = ₹140।\nविक्रय मूल्य (SP) = 140 पर 25% की छूट = 140 × (1 - 25/100) = 140 × 0.75 = ₹105।\nचूंकि SP, CP से अधिक है, तो लाभ = 105 - 100 = ₹5।\nलाभ प्रतिशत = (5/100) × 100 = 5%।"},
+  { q:"एक वस्तु को ₹450 में बेचने पर 10% की हानि होती है। इसे किस मूल्य पर बेचा जाए ताकि 20% का लाभ हो?", options:["₹500", "₹550", "₹600", "₹650"],
+    answerIndex:2, explanation:"पहले CP ज्ञात करें: CP = ₹450 / (1 - 10/100) = 450 / 0.9 = ₹500।\n20% का लाभ प्राप्त करने के लिए SP = ₹500 × (1 + 20/100) = 500 × 1.2 = ₹600।"},
+  { q:"एक दुकानदार 250 वस्तुएं ₹10,000 में खरीदता है। यदि वह सभी वस्तुओं को 10% लाभ पर बेचे, तो एक वस्तु का विक्रय मूल्य क्या होगा?", options:["₹40", "₹42", "₹44", "₹45"],
+    answerIndex:2, explanation:"कुल CP = ₹10,000। एक वस्तु का CP = 10000 / 250 = ₹40।\n10% लाभ पर एक वस्तु का SP = 40 × (1 + 10/100) = 40 × 1.1 = ₹44।"}
+];
+</script>
+
+<script>
+/* ===================== QUIZ ENGINE ===================== */
+const TOTAL_QUESTIONS = questions.length;
+const QUIZ_MINUTES = 35;
+const qNoEl=document.getElementById('qNo'), qTotalEl=document.getElementById('qTotal');
+const qTextEl=document.getElementById('qText'), optionsEl=document.getElementById('options');
+const progressPill=document.getElementById('progressPill');
+const prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+const clearBtn=document.getElementById('clearBtn'), submitBtn=document.getElementById('submitBtn');
+const timerEl=document.getElementById('timer');
+const quizCard=document.getElementById('quizCard'), resultCard=document.getElementById('resultCard');
+const reviewCard=document.getElementById('reviewCard'), scoreLine=document.getElementById('scoreLine');
+const correctCountEl=document.getElementById('correctCount'), wrongCountEl=document.getElementById('wrongCount');
+const unattCountEl=document.getElementById('unattCount'), scorePctEl=document.getElementById('scorePct');
+const timeUsedEl=document.getElementById('timeUsed'), reviewList=document.getElementById('reviewList');
+
+let current=1;
+let selections=Array(TOTAL_QUESTIONS).fill(null);
+let submitted=false;
+
+qTotalEl.textContent=TOTAL_QUESTIONS;
+renderQuestion();
+
+prevBtn.onclick=()=>{ if(current>1){ current--; renderQuestion(); } };
+nextBtn.onclick=()=>{ if(current<TOTAL_QUESTIONS){ current++; renderQuestion(); } };
+clearBtn.onclick=()=>{ selections[current-1]=null; renderQuestion(); updateProgress(); };
+submitBtn.onclick=submitQuiz;
+
+function renderQuestion(){
+  const q=questions[current-1];
+  qNoEl.textContent=current;
+  qTextEl.textContent=q.q;
+  optionsEl.innerHTML='';
+  q.options.forEach((opt,idx)=>{
+    const div=document.createElement('div');
+    div.className='opt'+(selections[current-1]===idx?' selected':'');
+    div.innerHTML=`<b>${String.fromCharCode(65+idx)}.</b> ${opt}`;
+    div.onclick=()=>{ selections[current-1]=idx; renderQuestion(); updateProgress(); };
+    optionsEl.appendChild(div);
+  });
+  prevBtn.disabled=current===1;
+  nextBtn.disabled=current===TOTAL_QUESTIONS;
+}
+function updateProgress(){
+  const attempted=selections.filter(x=>x!==null).length;
+  progressPill.textContent=`प्रयासित: ${attempted}`;
+}
+
+/* ========== TIMER ========== */
+let totalSeconds=QUIZ_MINUTES*60, elapsed=0;
+const t=setInterval(()=>{
+  if(submitted){ clearInterval(t); return; }
+  if(totalSeconds<=0){ timerEl.textContent='00:00'; autoSubmitOnTime(); clearInterval(t); return; }
+  totalSeconds--; elapsed++;
+  const mm=String(Math.floor(totalSeconds/60)).padStart(2,'0');
+  const ss=String(totalSeconds%60).padStart(2,'0');
+  timerEl.textContent=`${mm}:${ss}`;
+},1000);
+
+function autoSubmitOnTime(){
+  if(!submitted){ alert('समय समाप्त! टेस्ट स्वतः जमा हो रहा है।'); submitQuiz(); }
+}
+
+/* ========== SUBMIT & REVIEW ========== */
+function submitQuiz(){
+  if(submitted) return;
+  submitted=true;
+  prevBtn.disabled=true; nextBtn.disabled=true; clearBtn.disabled=true; submitBtn.disabled=true;
+
+  let correct=0, wrong=0, unatt=0;
+  selections.forEach((sel,i)=>{
+    if(sel===null){ unatt++; return; }
+    const ans=questions[i].answerIndex;
+    if(sel===ans) correct++; else wrong++;
+  });
+
+  const scorePct=Math.round((correct/TOTAL_QUESTIONS)*100);
+  const tu_m=Math.floor(elapsed/60);
+  const tu_s=String(elapsed%60).padStart(2,'0');
+
+  scoreLine.innerHTML=`आपका स्कोर: <b>${correct}/${TOTAL_QUESTIONS}</b> — <span class="${scorePct>=60?'correct':'wrong'}">${scorePct}%</span>`;
+  correctCountEl.textContent=correct; wrongCountEl.textContent=wrong; unattCountEl.textContent=unatt;
+  scorePctEl.textContent=scorePct; timeUsedEl.textContent=`${tu_m}:${tu_s}`;
+
+  quizCard.style.display='none';
+  resultCard.style.display='block';
+  reviewCard.style.display='block';
+
+  reviewList.innerHTML='';
+  questions.forEach((q,i)=>{
+    const div=document.createElement('div'); div.className='item';
+    const userSel=selections[i];
+    const isCorrect=userSel===q.answerIndex;
+    let ansText='';
+    if(userSel===null){
+      ansText=`❌ चयनित उत्तर: <span class="wrong">कोई नहीं</span>`;
+    } else if(isCorrect){
+      ansText=`✅ आपका उत्तर: <span class="correct">${q.options[userSel]}</span>`;
+    } else {
+      ansText=`❌ आपका उत्तर: <span class="wrong">${q.options[userSel]}</span> | सही उत्तर: <span class="correct">${q.options[q.answerIndex]}</span>`;
+    }
+    div.innerHTML=`
+      <b>प्र. ${i+1}.</b> ${q.q}<br>
+      <div class="ans">${ansText}</div>
+      <details><summary>🔎 स्पष्टीकरण</summary>${q.explanation}</details>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+</script>
+
+<div class="container">
+  <div class="card">
+    <h2 style="margin:0 0 12px;color:#0b3b99;">प्रश्नों का कोड संदर्भ (Technical Code Reference)</h2>
+    <p style="font-size:14px;color:#666;line-height:1.4;">यह संदर्भ प्रत्येक प्रश्न में इस्तेमाल किए गए मुख्य गणितीय तत्वों को दिखाता है।</p>
+    <div style="font-family:monospace;font-size:14px;background:#f8f9fc;padding:12px;border-radius:8px;line-height:1.6;">
+      <div><b>प्रश्न 1:</b> CP = ₹500, SP = ₹600. लाभ $\%$?</div>
+      <div><b>प्रश्न 2:</b> CP = ₹800, SP = ₹720. हानि $\%$?</div>
+      <div><b>प्रश्न 3:</b> SP = ₹1200, लाभ $= 20\%$. CP = ?</div>
+      <div><b>प्रश्न 4:</b> SP = ₹450, हानि $= 10\%$. CP = ?</div>
+      <div><b>प्रश्न 5:</b> MP = ₹200, छूट $= 15\%$. SP = ?</div>
+      <div><b>प्रश्न 6:</b> $20\%$ हानि पर SP = ₹400. $10\%$ लाभ के लिए SP = ?</div>
+      <div><b>प्रश्न 7:</b> $10\%$ लाभ पर SP = ₹220. $20\%$ लाभ के लिए SP = ?</div>
+      <div><b>प्रश्न 8:</b> CP = ₹2000, लाभ $= 30\%$. SP = ?</div>
+      <div><b>प्रश्न 9:</b> 1 kg की जगह 800 g. लाभ $\%$?</div>
+      <div><b>प्रश्न 10:</b> $10\%$ हानि और $10\%$ लाभ का अंतर $= ₹500$. CP = ?</div>
+      <div><b>प्रश्न 11:</b> $15\%$ हानि पर SP = ₹340. $20\%$ लाभ के लिए SP = ?</div>
+      <div><b>प्रश्न 12:</b> $15\%$ हानि पर SP = ₹1700. CP = ?</div>
+      <div><b>प्रश्न 13:</b> CP = ₹1500, लाभ $= 20\%$. SP = ?</div>
+      <div><b>प्रश्न 14:</b> CP = ₹600, SP = ₹750. लाभ/हानि $\%$?</div>
+      <div><b>प्रश्न 15:</b> $20\%$ लाभ पर SP = ₹8000. CP = ?</div>
+      <div><b>प्रश्न 16:</b> CP = ₹400, $10\%$ लाभ. $20\%$ छूट के बाद MP = ?</div>
+      <div><b>प्रश्न 17:</b> $20\%$ लाभ पर SP = ₹6000. $20\%$ हानि पर SP = ?</div>
+      <div><b>प्रश्न 18:</b> ₹1000 पर $25\%$ और $10\%$ की क्रमिक छूट। अंतिम SP = ?</div>
+      <div><b>प्रश्न 19:</b> CP = ₹800, हानि $= 25\%$. हानि की राशि?</div>
+      <div><b>प्रश्न 20:</b> $15\%$ लाभ पर SP = ₹460. CP = ?</div>
+      <div><b>प्रश्न 21:</b> $10\%$ हानि पर SP = ₹1800. $10\%$ लाभ के लिए SP = ?</div>
+      <div><b>प्रश्न 22:</b> $10 \times \text{CP} = 8 \times \text{SP}$. लाभ/हानि $\%$?</div>
+      <div><b>प्रश्न 23:</b> $40\%$ अधिक अंकित मूल्य, $25\%$ छूट। लाभ/हानि $\%$?</div>
+      <div><b>प्रश्न 24:</b> $10\%$ हानि पर SP = ₹450. $20\%$ लाभ के लिए SP = ?</div>
+      <div><b>प्रश्न 25:</b> कुल CP = ₹10000 (250 वस्तु), लाभ $= 10\%$. 1 वस्तु का SP = ?</div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>
